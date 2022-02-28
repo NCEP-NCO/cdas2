@@ -1,0 +1,58 @@
+      SUBROUTINE INTRP3(F,G,DX,DY,DZ,NX,NY,NZ,N)
+C$$$  SUBPROGRAM DOCUMENTATION BLOCK
+C                .      .    .                                       .
+C SUBPROGRAM:    INTRP3      LINEAR INTERPOLATION IN 3 DIMENSIONS.
+C   PRGMMR: PARRISH          ORG: W/NMC22    DATE: 90-10-11
+C
+C ABSTRACT: LINEAR INTERPOLATE IN 3 DIMS (2ND DIM ALWAYS PERIODIC).
+C
+C PROGRAM HISTORY LOG:
+C   90-10-11  PARRISH
+C
+C   INPUT ARGUMENT LIST:
+C     F        - INPUT INTERPOLATOR
+C     DX,DY,DZ - INPUT X,Y,Z-COORDS OF INTERPOLATION POINTS (GRID UNITS)
+C     NX,NY,NZ - X,Y,Z-DIMENSIONS OF INTERPOLATOR GRID
+C     N        - NUMBER OF INTERPOLATEES
+C
+C   OUTPUT ARGUMENT LIST:
+C     G        - OUTPUT INTERPOLATEES
+C
+C ATTRIBUTES:
+C   LANGUAGE: CFT77
+C   MACHINE:  CRAY YMP
+C
+C$$$
+C--------
+      DIMENSION F(NX+1,NY+2,NZ),G(N),DX(N),DY(N),DZ(N)
+C--------
+      DO 100 I=1,N
+        IX=DX(I)
+        IY=DY(I)
+        IZ=DZ(I)
+        IX=MAX(1,MIN(IX,NX))
+        IZ=MAX(1,MIN(IZ,NZ))
+        IXP=IX+1
+        IZP=IZ+1
+        IXP=MIN(IXP,NX)
+        IZP=MIN(IZP,NZ)
+        DELX=DX(I)-IX
+        DELY=DY(I)-IY
+        DELZ=DZ(I)-IZ
+        IF(IY.LT.1) IY=IY+NY
+        IF(IY.GT.NY) IY=IY-NY
+        IYP=IY+1
+        IF(IYP.GT.NY) IYP=IYP-NY
+        DELX=MAX(0.,MIN(DELX,1.))
+        DELZ=MAX(0.,MIN(DELZ,1.))
+        G(I)=F(IX,IY,IZ)*(1.-DELX)*(1.-DELY)*(1.-DELZ)
+     *      +F(IXP,IY,IZ)*DELX*(1.-DELY)*(1.-DELZ)
+     *      +F(IX,IYP,IZ)*(1.-DELX)*DELY*(1.-DELZ)
+     *      +F(IXP,IYP,IZ)*DELX*DELY*(1.-DELZ)
+     *      +F(IX,IY,IZP)*(1.-DELX)*(1.-DELY)*DELZ
+     *      +F(IXP,IY,IZP)*DELX*(1.-DELY)*DELZ
+     *      +F(IX,IYP,IZP)*(1.-DELX)*DELY*DELZ
+     *      +F(IXP,IYP,IZP)*DELX*DELY*DELZ
+100   CONTINUE
+      RETURN
+      END

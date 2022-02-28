@@ -1,0 +1,15 @@
+SHELL=/bin/sh
+LIBS	= -L/nwprod/lib -lw3_d 
+BUFR    = -L/nwprod/lib/ -lbufr_d_64
+PROG=r2_oiqc
+TARGET = cdas2_v1_oiqc
+OBJS = r2_oiqc.o ufbrew.o
+FFLAGS = -O2  -qrealsize=8 -qmaxmem=-1
+
+${TARGET}:   ${OBJS} 
+	ncepxlf $(FFLAGS) -o ${TARGET} $(OBJS) $(LIBS) $(BUFR)
+${PROG}.o: ${PROG}.f
+	   ncepxlf $(FFLAGS) -c  ${PROG}.f
+ufbrew.o: ufbrew.f
+	  ncepxlf $(FFLAGS) -c  ufbrew.f
+

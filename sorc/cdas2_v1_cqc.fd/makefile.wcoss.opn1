@@ -1,0 +1,14 @@
+w3lib=-L/nwprod/lib -lw3nco_d
+bufrlib=-L/nwprod/lib -lbufr_d_64
+
+FC=ifort
+FFLAGS=-O2 -r8 -convert big_endian -assume byterecl 
+
+f=r2_cqc
+target=cdas2_v1_cqc
+
+${target}:	$f.f
+	${FC} $(FFLAGS) -o ${target} $f.f ${w3lib} ${bufrlib}
+
+clean:
+	rm ${target}

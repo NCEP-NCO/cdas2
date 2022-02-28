@@ -1,0 +1,118 @@
+#!/bin/sh
+set -xa
+
+export RUN_ENVIR=${RUN_ENVIR:-prod}
+export job=${job:-CDAS2_V1_FORECAST}
+echo "packageroot=$PACKAGEROOT"
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=${DATA:-$DATAROOT/${jobid}}
+mkdir -p $DATA
+cd $DATA
+
+export cycle=t${cyc}z
+
+####################################
+# Specify NET Name and model
+####################################
+export NET=${NET:-cdas2}
+export RUN=${RUN:-cdas2}
+export model=${model:-cdas2}
+export version=${version:-${cdas2_ver}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.$$"
+touch $DATA/$pgmout
+
+####################################
+# SENDDBN  - Issue DBNet Client Calls
+# SENDCOM  - Copy files to /com directory
+####################################
+export SENDCOM=${SENDCOM:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+export CHGRP_RSTPROD=${CHGRP_RSTPROD:-YES}
+
+####################################
+# Specify Execution Areas
+####################################
+export HOMEcdas2=${HOMEcdas2:-$PACKAGEROOT/$model.$version}
+export EXECcdas2=${EXECcdas2:-$HOMEcdas2/exec}
+export FIXcdas2=${FIXcdas2:-$HOMEcdas2/fix}
+export PARMcdas2=${PARMcdas2:-$HOMEcdas2/parm}
+export USHcdas2=${USHcdas2:-$HOMEcdas2/ush}
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+  setpdy.sh
+. ./PDY
+
+# CDAS2 in 1-day lag
+  export PDY=$PDYm1
+  setpdy.sh
+. ./PDY
+
+##############################################
+# Define COM directories
+##############################################
+export COMCDAS2=${COMCDAS2:-$(compath.py ${NET}/${version})}
+export COMGFS=${COMGFS:-$(compath.py obsproc/${obsproc_ver})}
+export COMcdas2=$COMCDAS2/${RUN}.${PDY}
+export COMarkv=$COMCDAS2/${RUN}.`echo $PDY | cut -c1-6`
+
+mkdir -m 775 -p $COMcdas2
+
+##################################################
+# These 2 variables are needed in the ex-script
+##################################################
+export restart_step=${restart_step:-0}
+export PRECIP_SOIL_ADJ=yes
+
+# Maximum days allowed for the pentad data to be missing
+export max_nopentad=7
+
+##########################################################
+# The quality control step (buddy check) is slow with the
+# increased number of aircraft data.  The speed to do
+# buddy checks is n^2.  You can speed up the program by
+# running it with multiple threads.  Since only this program
+# can take advantage of the muliple cores, the extra cores
+# will be wasted with all the other programs used in the
+# FORECAST stepcan take advantage of the muliple cores, 
+# the extra cores will be wasted by all the other programs.
+#
+# Configuration for oiqc: stack size and number of threads
+# OMP_STACKSIZE is stack size for OpenMP for oiqc
+# OMP_NUM_NTHREADS is number of OpenMP threads for oiqc
+#
+##########################################################
+
+export OMP_STACKSIZE_OIQC="200M"
+export OMP_NUM_NTHREADS_OIQC=1
+env
+
+#############################################################
+# execute the script
+$HOMEcdas2/scripts/excdas2_v1_fcst.sh
+err=$?
+###################################################
+# msg end of job and clean up temperary directory
+###################################################
+cat $pgmout
+if [ $err -ne 0 ] ; then
+   msg="ENDED ABNORMALLY."
+   postmsg "$msg"
+else
+   msg="ENDED NORMALLY."
+   postmsg "$msg"
+   date
+   cd $DATAROOT
+   if [ "${KEEPDATA:-NO}" != "YES" ] ; then rm -rf $DATA ; fi
+fi
+date

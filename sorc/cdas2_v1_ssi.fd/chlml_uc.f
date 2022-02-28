@@ -1,0 +1,56 @@
+      SUBROUTINE CHLML(A,B,MI,NA,NB,ODIAG)
+C$$$  SUBPROGRAM DOCUMENTATION BLOCK
+C                .      .    .                                       .
+C SUBPROGRAM:    CHLML       CHOLESKY FACTORIZATION ROUTINE
+C   PRGMMR: PURSER           ORG: W/NMC20    DATE: 94-02-10
+C
+C ABSTRACT: OBTAIN CHOLESKY FACTORS OF SYMMETRIC MATRIX.
+C
+C PROGRAM HISTORY LOG:
+C   94-02-10  PURSER
+C
+C     CALL CHLML(A,B,MI,NA,NB,ODIAG)
+C   INPUT ARGUMENT LIST:
+C     A        - INPUT MATRIX
+C     MI       - DIMENSION OF A
+C     NA       - LEADING DIMENSION OF A IN CALLING PROGRAM
+C     NB       - LEADING DIMENSION OF B IN CALLING PROGRAM
+C
+C   OUTPUT ARGUMENT LIST:
+C     B        - OUTPUT CHOLESKY FACTOR
+C     ODIAG    - .FALSE.--NO PROBLEMS, .TRUE.--NON-POSITIVE MATRIX
+C
+C ATTRIBUTES:
+C   LANGUAGE: CFT77
+C   MACHINE:  CRAY YMP
+C
+C$$$
+C
+           DIMENSION A(NA,1),B(NB,1)
+           LOGICAL OMUL,ODIAG
+C-----
+      ODIAG=.FALSE.
+      DO 225 J=1,MI
+        JM=J-1
+        JP=J+1
+        S=A(J,J)
+        DO 226 K=1,JM
+226       S=S-B(J,K)**2
+        IF(S.LT.0.)THEN
+          WRITE(6,6000)J,S
+6000      FORMAT(1X,'CHLML NEG DIAG:',1X,I5,1X,E12.6)
+          S=-S
+          ODIAG=.TRUE.
+        ENDIF
+        B(J,J)=SQRT(S)
+        BJJI=1./B(J,J)
+        DO 227 I=JP,MI
+          S=A(I,J)
+          DO 228 K=1,JM
+228         S=S-B(I,K)*B(J,K)
+227       B(I,J)=S*BJJI
+        DO 229 I=1,JM
+229       B(I,J)=0.
+225   CONTINUE
+      RETURN
+      END

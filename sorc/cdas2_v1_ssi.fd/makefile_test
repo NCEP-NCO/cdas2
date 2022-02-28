@@ -1,0 +1,65 @@
+obj=chlml.o conmc.o dtast.o dvast.o fulldivt.o  g2s0.o gdcrdn.o gdcrdp.o \
+	genqsat.o getbaln.o getlalo.o getpln.o  glbsoi2.o grad2s.o gtbdivt.o \
+	gtbhalf.o hoper.o hopers.o htoper.o  inguess.o inguessv.o  initps2.o \
+	initqpw2.o initsat6.o  initt3.o initw2.o intps2.o intqpw2.o  intrp2.o \
+	intrp3.o intt3.o intw2.o  m1glat.o m1ipqr.o m1poly.o m1rcons2.o  pcgsoi5.o  \
+	prepp.o preppw.o prepq.o preps.o prept.o prepw.o prnon85.o qoper.o \
+	qtoper.o  rdfact.o rdgesc.o rdprep7.o rdtest9.o  residw.o respsf.o \
+	respw.o resq.o ressat.o restmp.o  s2g0.o s2grad.o s2gvec.o s2mg2x.o \
+	satc2.o satcov.o satop46.o  setuprhs5.o sprp2.o sprqpw2.o sprs6.o sprt2.o \
+	spruv2.o  ssi2.o tg2s0.o tgrad2s.o ts2g0.o ts2grad.o ts2gvec.o wranlc.o  \
+	fft99m.o sdot.o sgemv.o minv.o isrchfle.o isrchfge.o w3fs03.o w3fs11.o \
+	w3fs21.o 
+
+obj_uc=chlml_uc.o conmc_uc.o dtast_uc.o dvast_uc.o fulldivt_uc.o  g2s0_uc.o gdcrdn_uc.o gdcrdp_uc.o \
+	genqsat_uc.o getbaln_uc.o getlalo_uc.o getpln_uc.o  glbsoi2_uc.o grad2s_uc.o gtbdivt_uc.o \
+	gtbhalf_uc.o hoper_uc.o hopers_uc.o htoper_uc.o  inguess_uc.o inguessv_uc.o  initps2_uc.o \
+	initqpw2_uc.o initsat6_uc.o  initt3_uc.o initw2_uc.o intps2_uc.o intqpw2_uc.o  intrp2_uc.o \
+	intrp3_uc.o intt3_uc.o intw2_uc.o  m1glat_uc.o m1ipqr_uc.o m1poly_uc.o m1rcons2_uc.o  pcgsoi5_uc.o  \
+	prepp_uc.o preppw_uc.o prepq_uc.o preps_uc.o prept_uc.o prepw_uc.o prnon85_uc.o qoper_uc.o \
+	qtoper_uc.o  rdfact_uc.o rdgesc_uc.o rdprep7_uc.o rdtest9_uc.o  residw_uc.o respsf_uc.o \
+	respw_uc.o resq_uc.o ressat_uc.o restmp_uc.o  s2g0_uc.o s2grad_uc.o s2gvec_uc.o s2mg2x_uc.o \
+	satc2_uc.o satcov_uc.o satop46_uc.o  setuprhs5_uc.o sprp2_uc.o sprqpw2_uc.o sprs6_uc.o sprt2_uc.o \
+	spruv2_uc.o  ssi2_uc.o tg2s0_uc.o tgrad2s_uc.o ts2g0_uc.o ts2grad_uc.o ts2gvec_uc.o wranlc_uc.o  \
+	fft99m_uc.o sdot_uc.o sgemv_uc.o minv_uc.o isrchfle_uc.o isrchfge_uc.o w3fs03_uc.o w3fs11_uc.o \
+	w3fs21_uc.o 
+
+fflags=-O2 -qrealsize=8
+cflags=-q64 -c -O2
+
+bufr=/u/wx51we/home/r2/opn/sorc/bufr/bufr.o
+# w3=/u/wx51we/home/r2/opn/sorc/w3lib/w3lib.a
+w3=mova2i.o iw3jdn.o
+w3_opn=iw3jdn.o
+opn=/nwprod/lib/libbufr_d_64.a
+
+f=r2_ssi
+u=r2_ssi_uc
+o=r2_ssi_opn
+ou=r2_ssi_opn_uc
+
+all:	$f.x $o.x $u.x ${ou}.x
+
+
+$f.x:	$(obj) $(bufr) $(w3)
+	xlf_r -o $f.x  $(obj) $(bufr) $(w3)
+
+$u.x:	$(obj_uc) $(bufr) $(w3)
+	xlf_r -o $u.x  $(obj_uc) $(bufr) $(w3)
+
+$o.x:	$(obj) $(bufr) $(w3)
+	xlf_r -o $o.x  $(obj) $(opn) $(w3_opn)
+
+${ou}.x:	$(obj_uc) $(bufr) $(w3)
+	xlf_r -o ${ou}.x  $(obj_uc) $(opn) $(w3_opn)
+
+
+.f.o:
+	xlf_r ${fflags} -c $<
+
+
+.c.o:
+	xlc_r -c ${cflags} $<
+
+clean:
+	-rm -f $(obj)

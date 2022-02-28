@@ -1,0 +1,80 @@
+1.0.0  
+
+
+#define _MAXPAK_ 5000
+
+#define _MAXM_ 8000
+#define _MAXS_ 500
+
+#define _MAXCYL_ 100000
+#define _MAXREP_ 400000
+
+C  want _MAXREP_ < _MAXLEV_
+#define _MAXLEV_ 500000
+
+
+1.0.1
+#define _MAXPAK_ 51200
+
+#define _MAXM_ 9000
+#define _MAXS_ 700
+
+#define _MAXCYL_ 200000
+#define _MAXREP_ 500000
+
+C  want _MAXREP_ < _MAXLEV_
+#define _MAXLEV_ 600000
+
+1.0.2
+#define _MAXPAK_ 51200
+
+#define _MAXM_ 9000
+#define _MAXS_ 500
+
+#define _MAXCYL_ 100000
+#define _MAXREP_ 400000
+
+#C  want _MAXREP_ < _MAXLEV_
+#define _MAXLEV_ 1000000
+
+
+1.0.3
+
+#define _MAXPAK_ 51200
+
+#define _MAXM_ 9000
+#define _MAXS_ 500
+
+#define _MAXCYL_ 200000
+#define _MAXREP_ 800000
+
+C  want _MAXREP_ < _MAXLEV_
+#define _MAXLEV_ 2000000
+
+1.0.4
+
+#define _MAXPAK_ 51200
+
+#define _MAXM_ 15000
+#define _MAXS_ 500
+
+#define _MAXCYL_ 200000
+#define _MAXREP_ 800000
+
+#C  want _MAXREP_ < _MAXLEV_
+#define _MAXLEV_ 2000000
+
+1.0.5:
+  note: v1.0.5 is to make the code run faster
+  decided to increase size
+
+#define _MAXPAK_ 51200
+
+#define _MAXM_ 15000
+#define _MAXS_ 500
+
+#define _MAXCYL_ 400000
+#define _MAXREP_ 1200000
+
+#define _MAXLEV_ 2000000
+

@@ -1,0 +1,10 @@
+
+w3lib=-L/nwprod/lib -lw3_d
+
+f=r2_precipadj
+target=cdas2_v1_precipadj
+fflags=-O2 -qrealsize=8 
+
+${target}:	$f.f
+	ncepxlf $(fflags) -o ${target} $f.f ${w3lib}
+

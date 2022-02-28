@@ -1,0 +1,20 @@
+# w3=/u/wx51we/home/r2/opn/sorc/w3lib/w3lib.a
+# w3=w3pack.o mova2i.o xmovex.o w3fi01.o sbytes.o sbyte.o pdsens.f gbyte.o
+w3=/nwprod/lib/libw3_d.a
+
+
+f=r2_fcst
+cflags=-q64 -c -O2
+w3flags=-O2 -qrealsize=4
+
+$f.x:	$f.o ${w3}
+	xlf_r -o $f.x -O2 -qrealsize=8 $f.o ${w3}
+
+$f.o:	$f.f
+	xlf_r -c -O2 -qrealsize=8 $f.f
+
+.f.o:
+	xlf_r -c ${w3flags} $<
+
+.c.o:
+	xlc_r -c ${cflags} $<

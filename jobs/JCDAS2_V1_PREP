@@ -1,0 +1,118 @@
+#!/bin/sh
+#
+# PREP step:
+#   gets input files like bufr, sst, snow
+#
+set -xa
+
+export RUN_ENVIR=${RUN_ENVIR:-nco}
+export job=${job:-CDAS2_V1_PREP}
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+export DATA=${DATA:-$DATAROOT/${jobid}}
+mkdir -p $DATA
+cd $DATA
+if [ "$?" -ne 0 ] ; then
+   echo "$DATA not available"
+   exit 8
+fi
+export cycle=t${cyc}z
+
+####################################
+# Specify NET Name and model
+####################################
+export NET=${NET:-cdas2}
+export RUN=${RUN:-cdas2}
+export model=${model:-cdas2}
+export version=${version:-${cdas2_ver}}
+
+####################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.$$"
+touch $DATA/$pgmout
+
+####################################
+# SENDDBN  - Issue DBNet Client Calls
+# SENDCOM  - Copy files to /com directory
+####################################
+export SENDDBN=${SENDDBN:-YES}
+export SENDCOM=${SENDCOM:-YES}
+export CHGRP_RSTPROD=${CHGRP_RSTPROD:-YES}
+
+####################################
+# Specify Execution Areas
+####################################
+export HOMEcdas2=${HOMEcdas2:-$PACKAGEROOT/$model.$version}
+export EXECcdas2=${EXECcdas2:-$HOMEcdas2/exec}
+export FIXcdas2=${FIXcdas2:-$HOMEcdas2/fix}
+export PARMcdas2=${PARMcdas2:-$HOMEcdas2/parm}
+export USHcdas2=${USHcdas2:-$HOMEcdas2/ush}
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+if [ "$RUN_ENVIR" != nco ] ; then
+   echo "before PDY = $PDY"
+   setpdy.sh
+   . ./PDY
+   echo "after PDY = $PDY cycle=$cycle"
+else
+   setpdy.sh
+   . ./PDY
+
+   # CDAS2 in 1-day lag
+   export PDY=$PDYm1
+   setpdy.sh
+   . ./PDY
+fi
+
+#############################################
+# Define COM directories
+##############################################
+export COMCDAS2=${COMCDAS2:-$(compath.py ${NET}/${cdas2_ver})}
+export COMcdas2=$COMCDAS2/${RUN}.${PDY}
+export COMarkv=$COMCDAS2/${RUN}.`echo $PDY | cut -c1-6`
+
+export COMobsproc=${COMobsproc:-$(compath.py obsproc/${obsproc_ver})}
+
+mkdir -m 775 -p $COMcdas2
+
+# location of processed pentad precip 
+export COMPCP=$COMCDAS2/pentad
+
+# location of dcom for afwa snow
+export DCOM_SNOW=${DCOM_SNOW:-$DCOMROOT}
+
+# location of SST
+export COM_SST=${COM_SST:-$(compath.py nsst/${nsst_ver}/nsst)}
+
+# location of sea ice
+export COM_SICE=${COM_SICE:-$(compath.py seaice_analysis/${seaice_analysis_ver})/seaice_analysis}
+
+# Maximum days allowed for the pentad data to be missing
+export max_nopentad=7
+
+env
+
+#############################################################
+# execute the script
+$HOMEcdas2/scripts/excdas2_v1_prep.sh
+err=$?
+
+###################################################
+# msg end of job and clean up temperary directory
+###################################################
+
+cat $pgmout
+msg="ENDED NORMALLY."
+[ $err -ne 0 ] && msg="ENDED ABNORMALLY."
+postmsg "$msg"
+date
+
+cd $DATAROOT
+if [ "${KEEPDATA:-NO}" != "YES" ] ; then rm -rf $DATA ; fi
+

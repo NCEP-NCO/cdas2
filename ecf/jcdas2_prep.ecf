@@ -1,0 +1,32 @@
+#PBS -N cdas2_prep_%CYC%
+#PBS -l walltime=00:30:00
+#PBS -A %PROJ%-%PROJENVIR%
+#PBS -q %QUEUE%
+#PBS -l place=shared,select=1:ncpus=1:mem=1500MB
+#PBS -j oe
+#PBS -l debug=true
+
+model=cdas2
+%include <head.h>
+%include <envir-p1.h>
+
+module load intel/${intel_ver}
+module load PrgEnv-intel/${PrgEnv_intel_ver}
+module load craype/${craype_ver}
+module load cray-mpich/${cray_mpich_ver}
+module load libjpeg/${libjpeg_ver}
+module load grib_util/${grib_util_ver}
+module load wgrib2/${wgrib2_ver}
+
+set -x
+
+export cyc=%CYC%
+
+${HOMEcdas2}/jobs/JCDAS2_V1_PREP
+
+%include <tail.h>
+%manual
+################################################################################
+# PURPOSE:  To execute the job for cdas2 prep processing.
+################################################################################
+%end

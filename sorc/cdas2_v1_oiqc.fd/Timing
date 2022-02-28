@@ -1,0 +1,70 @@
+# 2 2-CPU 3/17/15 
+
+real	49m54.744s
+user	96m17.398s
+sys	1m17.578s
+
+# 3 2-CPU 3/17/15   same oiqc.anl.bufr as #2
+real    48m46.338s
+user    94m2.032s
+sys     1m18.904s
+
+# 4 2-CPU 3/18/2015 - parallelize call to search -- CMIC duplication
+real	44m3.692s
+user	65m38.528s
+sys	0m12.271s
+
+# 4 8- CPU 3/18/2015 - parallelize call to search -- CMIC duplication
+real    12m26.745s
+user    65m51.561s
+sys     0m7.970s
+661 MB memory
+
+# ----------------------------
+# bigger arrays
+# 128MB OMP stack
+#
+# 2 CPU
+# real    40m37.015s
+# user    59m45.753s
+# sys     0m8.322s
+# -----466 MB 
+
+# 4 CPU
+# real    22m9.248s
+# user    62m8.732s
+# sys     0m9.236s
+# ---- 624 MB
+#
+#
+ 8 CPU
+real    12m29.121s
+user    65m58.395s
+sys     0m8.610s
+---- 944 MB 
+
+#new test data  957 MB
+#
+16 CPU 
+real    7m35.900s
+user    74m43.630s
+sys     0m8.757s
+1594.69 MB
+
+3 CPU
+real    32m12.812s
+user    69m6.288s
+sys     0m8.132s
+Maximum resident set size (in Mbytes):       554.789
+
+#2 CPU
+real    45m12.130s
+user    66m16.071s
+sys     0m8.197s
+Maximum resident set size (in Mbytes):       477.496
+
+1 CPU - made maxcyl bigger.
+real    60m25.275s
+user    60m16.931s
+sys     0m8.088s
+

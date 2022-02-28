@@ -1,0 +1,2124 @@
+1,11c1,5
+< c  _IR_MAX_ is max number of corrections done
+< #define _IR_MAX_ 1500
+< 
+< C  _N_ is the maximun number of rawindesondes stations
+< C as of Aug 23 2013 was 221
+< #define _N_ 1500
+< 
+< C _NL_ is max number of levels in a sounding to be processed
+< #define _NL_ 255
+< 
+< 
+---
+> C NOTES: 5-2004: WNE
+> C  CHANGED /DATE/ TO /DATEC/ TO AVOID DUAL DEFINITIONS F90?
+> C  COMMENTED OUT SUBROUTINE ADDATE AS DEFINED IN BUFRLIBRARY
+> C     FIXED LEAP YEAR IN ADDATE (THIS ROUTINE AND BUFRLIB)
+> C
+28,38c22
+< C                         CHECKING TO ALLOW FOR _NL_ LEVELS.
+< C   04-05-01  W EBISUZAKI CHANGED /DATE/ TO /DATEC/ TO AVOID DUAL DEFNS
+< C                              F90?
+< C                         COMMENTED OUT SUBROUTINE ADDATE AS DEFINED IN 
+< C                              BUFRLIBRARY
+< C   12-11-10  W EBISUZAKI
+< C                         UNCOMMENTED OUT SUBROUTINE ADDATE AS NOLONGER
+< C                         CHANGED SOME A() = CONSTANT F90 SYNTAX
+< C                            REMOVE OUT-OF-BOUNDS ERROR MESSAGES
+< C   8-23-13   W EBISUZAKI ADDED ONE CHECK FOR IR > _IR_MAX
+< C                         MADE ARRAYS SIZES COMPILE TIME VARIALBLES
+---
+> C                         CHECKING TO ALLOW FOR 255 LEVELS.
+165c149
+<       SUBROUTINE ADDATE(IDATE,JH,JDATE)
+---
+> C      SUBROUTINE ADDATE(IDATE,JH,JDATE)
+167c151
+<       DIMENSION   MON(12)
+---
+> C      DIMENSION   MON(12)
+169c153
+<       DATA MON/31,28,31,30,31,30,31,31,30,31,30,31/
+---
+> C      DATA MON/31,28,31,30,31,30,31,31,30,31,30,31/
+174,177c158,161
+<       IY = MOD(IDATE/1000000,100)
+<       IM = MOD(IDATE/10000  ,100)
+<       ID = MOD(IDATE/100    ,100)
+<       IH = MOD(IDATE        ,100)
+---
+> C      IY = MOD(IDATE/1000000,100)
+> C      IM = MOD(IDATE/10000  ,100)
+> C      ID = MOD(IDATE/100    ,100)
+> C      IH = MOD(IDATE        ,100)
+179,182c163,166
+<       MON(2) = 28
+<       IF(MOD(IY,4).EQ.0) MON(2) = 29
+<       IF(MOD(IY,100).EQ.0) MON(2) = 28
+<       IF(MOD(IY,400).EQ.0) MON(2) = 29
+---
+> C      MON(2) = 28
+> C      IF(MOD(IY,4).EQ.0) MON(2) = 29
+> C      IF(MOD(IY,100).EQ.0) MON(2) = 28
+> C      IF(MOD(IY,400).EQ.0) MON(2) = 29
+184c168
+<       IH = IH+JH
+---
+> C      IH = IH+JH
+186,209c170,193
+<       IF(IH.LT.0) THEN
+<          IH = IH+24
+<          ID = ID-1
+<          IF(ID.EQ.0) THEN
+<             IM = IM-1
+<             IF(IM.EQ.0) THEN
+<                IM = 12
+<                IY = IY-1
+<                IF(IY.LT.0) IY = 99
+<             ENDIF
+<             ID = MON(IM)
+<          ENDIF
+<       ELSEIF(IH.GE.24) THEN
+<          IH = IH-24
+<          ID = ID+1
+<          IF(ID.GT.MON(IM)) THEN
+<             ID = 1
+<             IM = IM+1
+<             IF(IM.GT.12) THEN
+<                IM = 1
+<                IY = MOD(IY+1,100)
+<             ENDIF
+<          ENDIF
+<       ENDIF
+---
+> C      IF(IH.LT.0) THEN
+> C         IH = IH+24
+> C         ID = ID-1
+> C         IF(ID.EQ.0) THEN
+> C            IM = IM-1
+> C            IF(IM.EQ.0) THEN
+> C               IM = 12
+> C               IY = IY-1
+> C               IF(IY.LT.0) IY = 99
+> C            ENDIF
+> C            ID = MON(IM)
+> C         ENDIF
+> C      ELSEIF(IH.GE.24) THEN
+> C         IH = IH-24
+> C         ID = ID+1
+> C         IF(ID.GT.MON(IM)) THEN
+> C            ID = 1
+> C            IM = IM+1
+> C            IF(IM.GT.12) THEN
+> C               IM = 1
+> C               IY = MOD(IY+1,100)
+> C            ENDIF
+> C         ENDIF
+> C      ENDIF
+211c195
+<       JDATE = IY*1E6 + IM*1E4 + ID*1E2 + IH
+---
+> C      JDATE = IY*1E6 + IM*1E4 + ID*1E2 + IH
+213,214c197,198
+<       RETURN
+<       END
+---
+> C      RETURN
+> C      END
+236,260c220,244
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+447,466c431,450
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+556,558d539
+< 
+< 
+< 
+578,586c559,563
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+< 
+<       COMMON /LEV926/ ISET,MANLIN(1001)
+<       DATA ISET/0/
+< 
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+922,952c899,929
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+954,958c931,935
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+1404c1381
+<               IF(IR.GT._IR_MAX_) GO TO 110
+---
+>               IF(IR.GT.399) GO TO 110
+1700c1677
+<               IF(IR.GT._IR_MAX_) GO TO 110
+---
+>               IF(IR.GT.399) GO TO 110
+1797d1773
+<               IF(IR.GT._IR_MAX_) GO TO 110
+1884c1860
+<               IF(IR.GT._IR_MAX_) GO TO 110
+---
+>               IF(IR.GT.399) GO TO 110
+1951c1927
+<           IF(IR.GT._IR_MAX_) GO TO 110
+---
+>           IF(IR.GT.399) GO TO 110
+2061c2037
+<           IF(IR.GT._IR_MAX_) GO TO 110
+---
+>           IF(IR.GT.399) GO TO 110
+2141c2117
+<           IF(IR.GT._IR_MAX_) GO TO 110
+---
+>           IF(IR.GT.399) GO TO 110
+2216c2192
+<       IR = _IR_MAX_
+---
+>       IR = 399
+2331,2335c2307,2311
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+3203,3233c3179,3209
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+3249,3253c3225,3229
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+3256c3232
+<       DIMENSION   IDSORT(_N_), NER(21,8,2)
+---
+>       DIMENSION   IDSORT(899), NER(21,8,2)
+3851,3852c3827,3828
+<       INTEGER N(23), MSK(_N_)
+<       REAL X(_N_), XLIM(2)
+---
+>       INTEGER N(23), MSK(899)
+>       REAL X(899), XLIM(2)
+3951,3965c3927,3941
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+4046,4051c4022,4026
+< C-CRA       COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+< C-CRA1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),IND(_NL_),
+< C0CRA2                      TFC(_NL_)
+<             COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+<      1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),TFC(_NL_)
+<             COMMON /ALLSNDI/IND(_NL_)
+---
+> C-CRA       COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+> C-CRA1                      PQM(255),TQM(255),ZQM(255),IND(255),TFC(255)
+>             COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+>      1                      PQM(255),TQM(255),ZQM(255),TFC(255)
+>             COMMON /ALLSNDI/IND(255)
+4062c4037
+<       REAL         HDR(10),OBS(10,_NL_),QMS(10,_NL_)
+---
+>       REAL         HDR(10),OBS(10,255),QMS(10,255)
+4133c4108
+<       IF(IOBS.GT._N_) GOTO 901
+---
+>       IF(IOBS.GT.899) GOTO 901
+4135,4136c4110,4111
+<       CALL UFBINT(NFIN,OBS,10,_NL_,NLVD,OSTR)
+<       CALL UFBINT(NFIN,QMS,10,_NL_,NLVQ,QSTR)
+---
+>       CALL UFBINT(NFIN,OBS,10,255,NLVD,OSTR)
+>       CALL UFBINT(NFIN,QMS,10,255,NLVQ,QSTR)
+4176c4151
+<   502 FORMAT(' NO. OBSERVATIONS GREATER THAN _N_')
+---
+>   502 FORMAT(' NO. OBSERVATIONS GREATER THAN 899')
+4228c4203
+<       REAL TIN(_NL_), HMN(_NL_), HAN(_NL_), VMN(_NL_), VAN(_NL_)
+---
+>       REAL TIN(255), HMN(255), HAN(255), VMN(255), VAN(255)
+4646c4621
+<       DIMENSION     EVNS(4,_NL_)
+---
+>       DIMENSION     EVNS(4,255)
+4660,4663c4635,4637
+<       EVNS = BMISS
+< C      DO IJ=1,4*_NL_
+< C        EVNS(IJ,1) = BMISS
+< C      ENDDO
+---
+>       DO IJ=1,4*255
+>         EVNS(IJ,1) = BMISS
+>       ENDDO
+4702c4676
+< CC   OUTPUT ARGUMENT LIST:
+---
+> C   OUTPUT ARGUMENT LIST:
+5081,5083c5055,5057
+<      &	XPC(*), ZC(*), TC(*), WKSP(_NL_), TTRYC(*), TNEWC(*),
+<      &	PMQ(21), ZMQ(21), TMQ(21), PPQ(_NL_), ZZQ(_NL_), TTQ(_NL_),
+<      &	ZQC(_NL_), TQC(_NL_), PQC(_NL_)
+---
+>      &	XPC(*), ZC(*), TC(*), WKSP(255), TTRYC(*), TNEWC(*),
+>      &	PMQ(21), ZMQ(21), TMQ(21), PPQ(255), ZZQ(255), TTQ(255),
+>      &	ZQC(255), TQC(255), PQC(255)
+5085,5086c5059,5060
+<      &	IWKSP(_NL_)
+< C-MK &	IWKSP(_NL_), NEVNTI(2)
+---
+>      &	IWKSP(255)
+> C-MK &	IWKSP(255), NEVNTI(2)
+5090,5094c5064,5068
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+5260,5266c5234,5240
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+5401c5375
+<       REAL TGES(21,_N_), TMG(*)
+---
+>       REAL TGES(21,899), TMG(*)
+5447,5469c5421,5443
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+5548,5570c5522,5544
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+5582c5556
+<       DIMENSION HSTDPS(_N_),DMAX(1,1)
+---
+>       DIMENSION HSTDPS(899),DMAX(1,1)
+5644,5658c5618,5632
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+5666,5670c5640,5644
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+5962,5981c5936,5955
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+5993,5997c5967,5971
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+6102,6112c6076,6086
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+6219c6193
+<       COMMON /ISO/ IDISO(_N_), NUM
+---
+>       COMMON /ISO/ IDISO(899), NUM
+6222c6196
+<         DO I=1,_N_
+---
+>         DO I=1,899
+6239a6214,6218
+> 	BLOCK DATA
+>       COMMON /LEV926/ ISET,MANLIN(1001)
+> 	DATA ISET/0/
+> 	END
+> C-----------------------------------------------------------------------
+6334,6338c6313,6317
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+6488,6504c6467,6483
+< C-CRA       COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+< C-CRA1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),IND(_NL_),TFC(_NL_)
+<             COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+<      1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),TFC(_NL_)
+<             COMMON /ALLSNDI/IND(_NL_)
+< C-CRA COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+< C-CRA.                PQ (_NL_),TQ (_NL_),ZQ (_NL_),IN (_NL_),
+< C-CRA.                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+<      .                PQ (_NL_),TQ (_NL_),ZQ (_NL_),
+<      .                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSNDI/IN (_NL_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA       COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+> C-CRA1                      PQM(255),TQM(255),ZQM(255),IND(255),TFC(255)
+>             COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+>      1                      PQM(255),TQM(255),ZQM(255),TFC(255)
+>             COMMON /ALLSNDI/IND(255)
+> C-CRA COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+> C-CRA.                PQ (255),TQ (255),ZQ (255),IN (255),
+> C-CRA.                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+>      .                PQ (255),TQ (255),ZQ (255),
+>      .                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSNDI/IN (255)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+6533,6544c6512,6517
+<         PO = BMISS
+<         TO = BMISS
+<         ZO = BMISS
+<         IN = BMISS
+< 
+< 
+< C      DO IJ=1,_NL_
+< C        PO(IJ) = BMISS
+< C        TO(IJ) = BMISS
+< C        ZO(IJ) = BMISS
+< C        IN(IJ) = BMISS
+< C      ENDDO
+---
+>       DO IJ=1,255
+>         PO(IJ) = BMISS
+>         TO(IJ) = BMISS
+>         ZO(IJ) = BMISS
+>         IN(IJ) = BMISS
+>       ENDDO
+6908,6924c6881,6897
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+7271,7277c7244,7250
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+7289,7293c7262,7266
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+7358c7331
+<       DO 119 IS=1,_N_
+---
+>       DO 119 IS=1,899
+7370c7343
+<         DO 19 IS=1,_N_
+---
+>         DO 19 IS=1,899
+7534,7538c7507,7511
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+7713c7686
+<       COMMON /ISO/ IDISO(_N_), NUM
+---
+>       COMMON /ISO/ IDISO(899), NUM
+7807,7811c7780,7784
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+8176,8180c8149,8153
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+8350c8323
+<       INTEGER MSK(_N_)
+---
+>       INTEGER MSK(899)
+8352,8371c8325,8344
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+8379,8383c8352,8356
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+8510c8483
+<       REAL X(_N_), Y(21,2,_N_)
+---
+>       REAL X(899), Y(21,2,899)
+8545c8518
+<       REAL X(_N_), Y(20,_N_)
+---
+>       REAL X(899), Y(20,899)
+8745,8758c8718,8727
+<      &	Z(_NL_), PC(_NL_), XPC(_NL_), ZC(_NL_), TC(_NL_),
+<      &	TFU(_NL_), TGES(21,_N_), TG(_NL_), TD(_NL_), TTRY(_NL_), 
+<      &  TTRYC(_NL_),
+<      &  PD(_NL_), XPD(_NL_), ZD(_NL_), TID(_NL_), HMD(_NL_), 
+<      &  HAD(_NL_),
+<      &	VMD(_NL_), VAD(_NL_), TSTRD(_NL_), TNEW(_NL_), TNEWC(_NL_),
+<      &	TIC(_NL_), HMC(_NL_), HAC(_NL_), VMC(_NL_), VAC(_NL_), 
+<      &  TSTARC(_NL_),
+<      &	PMQ(21), ZMQ(21), TMQ(21), PPQ(_NL_), ZZQ(_NL_), TTQ(_NL_),
+<      &	PQD(_NL_), ZQD(_NL_), TQD(_NL_), PQC(_NL_), ZQC(_NL_), TQC(_NL_)
+<       INTEGER INDX(_NL_), ITYP(_NL_), MB(_NL_), MA(_NL_), NB(_NL_), 
+<      &  NA(_NL_),
+<      &	IDECC(_NL_), IHYDC(_NL_), IERRC(_NL_), INDXD(_NL_), ITYPD(_NL_),
+<      &  IDECD(_NL_), IHYDD(_NL_), IERRD(_NL_), IDM(*), IDS(*)
+---
+>      &	Z(255), PC(255), XPC(255), ZC(255), TC(255),
+>      &	TFU(255), TGES(21,899), TG(255), TD(255), TTRY(255), TTRYC(255),
+>      &  PD(255), XPD(255), ZD(255), TID(255), HMD(255), HAD(255),
+>      &	VMD(255), VAD(255), TSTRD(255), TNEW(255), TNEWC(255),
+>      &	TIC(255), HMC(255), HAC(255), VMC(255), VAC(255), TSTARC(255),
+>      &	PMQ(21), ZMQ(21), TMQ(21), PPQ(255), ZZQ(255), TTQ(255),
+>      &	PQD(255), ZQD(255), TQD(255), PQC(255), ZQC(255), TQC(255)
+>       INTEGER INDX(255), ITYP(255), MB(255), MA(255), NB(255), NA(255),
+>      &	IDECC(255), IHYDC(255), IERRC(255), INDXD(255), ITYPD(255),
+>      &  IDECD(255), IHYDD(255), IERRD(255), IDM(*), IDS(*)
+8762,8768c8731,8737
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+8783c8752
+<       COMMON /REPRT/ PSSU, ZU(21), TU(21), PSIGU(_NL_), TSIGU(_NL_),
+---
+>       COMMON /REPRT/ PSSU, ZU(21), TU(21), PSIGU(255), TSIGU(255),
+8787,8791c8756,8760
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+9173c9142
+<       DIMENSION RA(*), WKSP(_N_)
+---
+>       DIMENSION RA(*), WKSP(899)
+9188c9157
+<       DIMENSION IA(*), IWKSP(_N_)
+---
+>       DIMENSION IA(*), IWKSP(899)
+9221c9190
+<       INTEGER NI(_IR_MAX_), NTMP(_IR_MAX_)
+---
+>       INTEGER NI(399), NTMP(399)
+9223,9232c9192,9201
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+9279c9248
+<       INTEGER ITEMP(_N_), ID(_N_), IDSORT(_N_)
+---
+>       INTEGER ITEMP(899), ID(899), IDSORT(899)
+9288c9257
+<       DO 10 I=1,_N_
+---
+>       DO 10 I=1,899
+9340,9341c9309,9310
+<       REAL XLIM(2), X(_N_)
+<       INTEGER NDIST(23), MSK(_N_)
+---
+>       REAL XLIM(2), X(899)
+>       INTEGER NDIST(23), MSK(899)
+9367,9388c9336,9357
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+9670,9687c9639,9656
+< C-CRA       COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+< C-CRA1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),IND(_NL_),TFC(_NL_)
+<             COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+<      1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),TFC(_NL_)
+<             COMMON /ALLSNDI/IND(_NL_)
+< C-CRA COMMON /EVNSND/ P  (_NL_),T  (_NL_),Z  (_NL_),CA (_NL_),
+< C-CRA.                PQ (_NL_),TQ (_NL_),ZQ (_NL_),IN (_NL_),
+< C-CRA.                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSND/ P  (_NL_),T  (_NL_),Z  (_NL_),CA (_NL_),
+<      .                PQ (_NL_),TQ (_NL_),ZQ (_NL_),
+<      .                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSNDI/IN (_NL_)
+< C-CRA COMMON /SIGCHK/ TPRM(_NL_),HRES(_NL_),SRES(_NL_),RES (_NL_),
+< C-CRA.                MAN1(_NL_),MAN2(_NL_),IECM(_NL_),IECS(_NL_),
+< C-CRA.                RESS(_NL_),RESM(_NL_),REST(_NL_)
+<       COMMON /SIGCHK / TPRM(_NL_),HRES(_NL_),SRES(_NL_),RES (_NL_),
+<      .                 RESS(_NL_),RESM(_NL_),REST(_NL_)
+<       COMMON /SIGCHKI/ MAN1(_NL_),MAN2(_NL_),IECM(_NL_),IECS(_NL_)
+---
+> C-CRA       COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+> C-CRA1                      PQM(255),TQM(255),ZQM(255),IND(255),TFC(255)
+>             COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+>      1                      PQM(255),TQM(255),ZQM(255),TFC(255)
+>             COMMON /ALLSNDI/IND(255)
+> C-CRA COMMON /EVNSND/ P  (255),T  (255),Z  (255),CA (255),
+> C-CRA.                PQ (255),TQ (255),ZQ (255),IN (255),
+> C-CRA.                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSND/ P  (255),T  (255),Z  (255),CA (255),
+>      .                PQ (255),TQ (255),ZQ (255),
+>      .                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSNDI/IN (255)
+> C-CRA COMMON /SIGCHK/ TPRM(255),HRES(255),SRES(255),RES (255),
+> C-CRA.                MAN1(255),MAN2(255),IECM(255),IECS(255),
+> C-CRA.                RESS(255),RESM(255),REST(255)
+>       COMMON /SIGCHK / TPRM(255),HRES(255),SRES(255),RES (255),
+>      .                 RESS(255),RESM(255),REST(255)
+>       COMMON /SIGCHKI/ MAN1(255),MAN2(255),IECM(255),IECS(255)
+9700,9701c9669,9670
+<       INTEGER     INX(_NL_), IDM(21), IDS(_NL_), IDEC(_NL_)
+<       REAL	  ZM(21), TM(21), TMG(21), PP(_NL_), TT(_NL_), TG(_NL_),
+---
+>       INTEGER     INX(255), IDM(21), IDS(255), IDEC(255)
+>       REAL	  ZM(21), TM(21), TMG(21), PP(255), TT(255), TG(255),
+9703c9672
+<      &		  PPQ(_NL_), ZZQ(_NL_), TTQ(_NL_)
+---
+>      &		  PPQ(255), ZZQ(255), TTQ(255)
+10054,10060c10023,10029
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+10062,10065c10031,10034
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+10069,10073c10038,10042
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+10708,10722c10677,10691
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+---
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+10743,10749c10712,10718
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+10751,10755c10720,10724
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+10769,10772c10738,10741
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+11228,11232c11197,11201
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+11376,11380c11345,11349
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+11416,11441c11385,11410
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+11850,11854c11819,11823
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+11890,11915c11859,11884
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+12172,12176c12141,12145
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+12212,12233c12181,12202
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+12512,12513d12480
+< 
+<       GOTO 123
+12515,12520d12481
+<       WRITE(*,*) '*** WARNING ***'
+<       WRITE(*,*) '*** IR=', IR, ' ***'
+<       WRITE(*,*) 'INCREASE IR_MAXand recompile_ ***'
+<       WRITE(*,*) 'CONTINUING'
+< 123   CONTINUE
+< 
+12561,12565c12522,12526
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+12600,12621c12561,12582
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+12971,12975c12932,12936
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+13010,13031c12971,12992
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+13367,13371c13328,13332
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+13380,13386c13341,13347
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+13415,13429c13376,13390
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+14047,14077c14008,14038
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+< C-CRA COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+< C-CRA.               IDH(4,21,2,_N_),  WTH(4,21,2,_N_),
+< C-CRA.               HINCPS(_N_), IDHPS(4,_N_), WTHPS(4,_N_)
+<       COMMON /HCK /HINC(21,2,_N_), HSTD(21,2,_N_),
+<      .               WTH(4,21,2,_N_),HINCPS(_N_), WTHPS(4,_N_)
+<       COMMON /HCKI/IDH(4,21,2,_N_),IDHPS(4,_N_)
+< C-CRA COMMON /HYCK/ HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+< C-CRA&  ISL(21,_N_), ISU(21,_N_), KMAX(_N_), BRES(_N_), LEV2(_N_),
+< C-CRA&  PSCOR(_N_),LEV1(_N_),Z1COR(_N_),Z2COR(_N_), REDUC(_N_)
+<       COMMON /HYCK / HYRES(21,_N_), SBIG(21,_N_), BSUM(20,_N_),
+<      &               BRES(_N_),PSCOR(_N_),Z1COR(_N_),Z2COR(_N_),
+<      &               REDUC(_N_)
+<       COMMON /HYCKI/ ISL(21,_N_), ISU(21,_N_), KMAX(_N_), LEV2(_N_),
+<      &               LEV1(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+> C-CRA COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+> C-CRA.               IDH(4,21,2,899),  WTH(4,21,2,899),
+> C-CRA.               HINCPS(899), IDHPS(4,899), WTHPS(4,899)
+>       COMMON /HCK /HINC(21,2,899), HSTD(21,2,899),
+>      .               WTH(4,21,2,899),HINCPS(899), WTHPS(4,899)
+>       COMMON /HCKI/IDH(4,21,2,899),IDHPS(4,899)
+> C-CRA COMMON /HYCK/ HYRES(21,899), SBIG(21,899), BSUM(20,899),
+> C-CRA&  ISL(21,899), ISU(21,899), KMAX(899), BRES(899), LEV2(899),
+> C-CRA&  PSCOR(899),LEV1(899),Z1COR(899),Z2COR(899), REDUC(899)
+>       COMMON /HYCK / HYRES(21,899), SBIG(21,899), BSUM(20,899),
+>      &               BRES(899),PSCOR(899),Z1COR(899),Z2COR(899),
+>      &               REDUC(899)
+>       COMMON /HYCKI/ ISL(21,899), ISU(21,899), KMAX(899), LEV2(899),
+>      &               LEV1(899)
+14110,14113c14071,14074
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+14660,14667c14621,14628
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+14678,14682c14639,14643
+< C-CRA COMMON /ERROR/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+< C-CRA&               NERT(21,2,_N_,2), DHOUR(_IR_MAX_), NERTPS(_N_,2)
+<       COMMON /ERROR/ DHOUR(_IR_MAX_)
+<       COMMON /ERRORI/ NERR(21,2,_N_,2), NEVNT(22,_IR_MAX_), IR,
+<      &                NERT(21,2,_N_,2), NERTPS(_N_,2)
+---
+> C-CRA COMMON /ERROR/ NERR(21,2,899,2), NEVNT(22,399), IR,
+> C-CRA&               NERT(21,2,899,2), DHOUR(399), NERTPS(899,2)
+>       COMMON /ERROR/ DHOUR(399)
+>       COMMON /ERRORI/ NERR(21,2,899,2), NEVNT(22,399), IR,
+>      &                NERT(21,2,899,2), NERTPS(899,2)
+14986,14993c14947,14954
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+<       COMMON /VCK/ VINC(21,2,_N_), WTV(2,21,2,_N_)
+---
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+>       COMMON /VCK/ VINC(21,2,899), WTV(2,21,2,899)
+15252,15264c15213,15225
+< C-CRA       COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+< C-CRA1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),IND(_NL_),TFC(_NL_)
+<             COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+<      1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),TFC(_NL_)
+<             COMMON /ALLSNDI/IND(_NL_)
+< C-CRA COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+< C-CRA.                PQ (_NL_),TQ (_NL_),ZQ (_NL_),IN (_NL_),
+< C-CRA.                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+<      .                PQ (_NL_),TQ (_NL_),ZQ (_NL_),
+<      .                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSNDI/IN (_NL_)
+<       COMMON /MOISTR/ QOB(_NL_),QQM(_NL_),TDO(_NL_),QO(_NL_),QQ(_NL_)
+---
+> C-CRA       COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+> C-CRA1                      PQM(255),TQM(255),ZQM(255),IND(255),TFC(255)
+>             COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+>      1                      PQM(255),TQM(255),ZQM(255),TFC(255)
+>             COMMON /ALLSNDI/IND(255)
+> C-CRA COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+> C-CRA.                PQ (255),TQ (255),ZQ (255),IN (255),
+> C-CRA.                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+>      .                PQ (255),TQ (255),ZQ (255),
+>      .                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSNDI/IN (255)
+>       COMMON /MOISTR/ QOB(255),QQM(255),TDO(255),QO(255),QQ(255)
+15280c15241
+<       DO IJ=1,_NL_
+---
+>       DO IJ=1,255
+15553,15564c15514,15525
+< C-CRA       COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+< C-CRA1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),IND(_NL_),TFC(_NL_)
+<             COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+<      1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),TFC(_NL_)
+<             COMMON /ALLSNDI/IND(_NL_)
+< C-CRA COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+< C-CRA.                PQ (_NL_),TQ (_NL_),ZQ (_NL_),IN (_NL_),
+< C-CRA.                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+<      .                PQ (_NL_),TQ (_NL_),ZQ (_NL_),
+<      .                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSNDI/IN (_NL_)
+---
+> C-CRA       COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+> C-CRA1                      PQM(255),TQM(255),ZQM(255),IND(255),TFC(255)
+>             COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+>      1                      PQM(255),TQM(255),ZQM(255),TFC(255)
+>             COMMON /ALLSNDI/IND(255)
+> C-CRA COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+> C-CRA.                PQ (255),TQ (255),ZQ (255),IN (255),
+> C-CRA.                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+>      .                PQ (255),TQ (255),ZQ (255),
+>      .                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSNDI/IN (255)
+15633c15594
+<       DO IJ=1,_NL_
+---
+>       DO IJ=1,255
+15650c15611
+<         write(*,*) 'location fort.4 8888: '
+---
+>  
+17912c17873
+<       PARAMETER (MXOBS=_N_)
+---
+>       PARAMETER (MXOBS=899)
+17915,17926c17876,17887
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+< C-CRA&  OINC(21,2,_N_), MAN(_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+< C-CRA&  TS(_N_)
+<       COMMON /DATA/ OBS(21,3,_N_), GES(21,2,_N_), PSL(_N_), DHR(_N_),
+<      &  OINC(21,2,_N_), PS(_N_), GESPS(_N_), OINCPS(_N_),
+<      &  TS(_N_)
+<       COMMON /DATAI/ MAN(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+> C-CRA&  OINC(21,2,899), MAN(899), PS(899), GESPS(899), OINCPS(899),
+> C-CRA&  TS(899)
+>       COMMON /DATA/ OBS(21,3,899), GES(21,2,899), PSL(899), DHR(899),
+>      &  OINC(21,2,899), PS(899), GESPS(899), OINCPS(899),
+>      &  TS(899)
+>       COMMON /DATAI/ MAN(899)
+17942c17903
+<       DIMENSION    HDR(10),SF0(10),SF2(10),UPA(10,_NL_)
+---
+>       DIMENSION    HDR(10),SF0(10),SF2(10),UPA(10,255)
+17964c17925
+<       DO IJ=1,_N_
+---
+>       DO IJ=1,899
+17968,17979c17929,17935
+< 
+<       OBS = BMISS
+< C      DO IJ=1,21*3*_N_
+< C        OBS(IJ,1,1) = BMISS
+< C      ENDDO
+< 
+<        GES = BMISS
+< C      DO IJ=1,21*2*_N_
+< C        GES(IJ,1,1) = BMISS
+< C      ENDDO
+< 
+<       DO IJ=1,_N_
+---
+>       DO IJ=1,21*3*899
+>         OBS(IJ,1,1) = BMISS
+>       ENDDO
+>       DO IJ=1,21*2*899
+>         GES(IJ,1,1) = BMISS
+>       ENDDO
+>       DO IJ=1,899
+18019c17975
+<       CALL UFBINT(NFIN,UPA,10,_NL_,NRET,CAT1)
+---
+>       CALL UFBINT(NFIN,UPA,10,255,NRET,CAT1)
+18168,18171c18124,18127
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+18196,18212c18152,18161
+< 
+<       TOBS = BMISS
+< C      DO IJ=1,21*3*_N_*4
+< C        TOBS(IJ,1,1,1) = BMISS
+< C      ENDDO
+< 
+<         TRES = BMISS
+< C      DO IJ=1,21*2*_N_
+< C        TRES(IJ,1,1) = BMISS
+< C      ENDDO
+< 
+<         TPS = BMISS
+< C      DO IJ=1,_N_*4
+< C        TPS(IJ,1) = BMISS
+< C      ENDDO
+< 
+<       DO IJ=1,_N_
+---
+>       DO IJ=1,21*3*899*4
+>         TOBS(IJ,1,1,1) = BMISS
+>       ENDDO
+>       DO IJ=1,21*2*899
+>         TRES(IJ,1,1) = BMISS
+>       ENDDO
+>       DO IJ=1,899*4
+>         TPS(IJ,1) = BMISS
+>       ENDDO
+>       DO IJ=1,899
+18271,18279c18220,18228
+< C-CRA COMMON /STN/ CID(_N_), SLAT(_N_), SLON(_N_), SELV(_N_),
+< C-CRA&  IN(72,36,2), ID(_N_)
+<       COMMON /STN / SLAT(_N_), SLON(_N_), SELV(_N_)
+<       COMMON /STNI/ IN(72,36,2), ID(_N_)
+<       COMMON /STNC/ CID(_N_)
+< C-CRA COMMON /TCK/ TOBS(21,3,_N_,4), TRES(21,2,_N_), ITERR(4),
+< C-CRA&             TPS(_N_,4), TPSRES(_N_)
+<       COMMON /TCK / TOBS(21,3,_N_,4), TRES(21,2,_N_),
+<      &             TPS(_N_,4), TPSRES(_N_)
+---
+> C-CRA COMMON /STN/ CID(899), SLAT(899), SLON(899), SELV(899),
+> C-CRA&  IN(72,36,2), ID(899)
+>       COMMON /STN / SLAT(899), SLON(899), SELV(899)
+>       COMMON /STNI/ IN(72,36,2), ID(899)
+>       COMMON /STNC/ CID(899)
+> C-CRA COMMON /TCK/ TOBS(21,3,899,4), TRES(21,2,899), ITERR(4),
+> C-CRA&             TPS(899,4), TPSRES(899)
+>       COMMON /TCK / TOBS(21,3,899,4), TRES(21,2,899),
+>      &             TPS(899,4), TPSRES(899)
+18283c18232
+<       DIMENSION   IIT(4),HDR(10),UPA(10,_NL_)
+---
+>       DIMENSION   IIT(4),HDR(10),UPA(10,255)
+18329c18278
+<       CALL UFBINT(LUTC,UPA,10,_NL_,NRET,USTR)
+---
+>       CALL UFBINT(LUTC,UPA,10,255,NRET,USTR)
+18438,18450c18387,18399
+< C-CRA       COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+< C-CRA1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),IND(_NL_),TFC(_NL_)
+<             COMMON /ALLSND/ POB(_NL_),TOB(_NL_),ZOB(_NL_),CAT(_NL_),
+<      1                      PQM(_NL_),TQM(_NL_),ZQM(_NL_),TFC(_NL_)
+<             COMMON /ALLSNDI/IND(_NL_)
+< C-CRA COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+< C-CRA.                PQ (_NL_),TQ (_NL_),ZQ (_NL_),IN (_NL_),
+< C-CRA.                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSND/ PO (_NL_),TO (_NL_),ZO (_NL_),CA (_NL_),
+<      .                PQ (_NL_),TQ (_NL_),ZQ (_NL_),
+<      .                PR (_NL_),TR (_NL_),ZR (_NL_)
+<       COMMON /EVNSNDI/IN (_NL_)
+<       COMMON /MOISTR/ QOB(_NL_),QQM(_NL_),TDO(_NL_),QO(_NL_),QQ(_NL_)
+---
+> C-CRA       COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+> C-CRA1                      PQM(255),TQM(255),ZQM(255),IND(255),TFC(255)
+>             COMMON /ALLSND/ POB(255),TOB(255),ZOB(255),CAT(255),
+>      1                      PQM(255),TQM(255),ZQM(255),TFC(255)
+>             COMMON /ALLSNDI/IND(255)
+> C-CRA COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+> C-CRA.                PQ (255),TQ (255),ZQ (255),IN (255),
+> C-CRA.                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSND/ PO (255),TO (255),ZO (255),CA (255),
+>      .                PQ (255),TQ (255),ZQ (255),
+>      .                PR (255),TR (255),ZR (255)
+>       COMMON /EVNSNDI/IN (255)
+>       COMMON /MOISTR/ QOB(255),QQM(255),TDO(255),QO(255),QQ(255)
+18464c18413
+<       REAL         HDR(10),OBS(10,_NL_)
+---
+>       REAL         HDR(10),OBS(10,255)
+18524c18473
+<       CALL UFBINT(NFIN,OBS,10,_NL_,ILV,OSTR)
+---
+>       CALL UFBINT(NFIN,OBS,10,255,ILV,OSTR)
+18592,18598c18541,18547
+<          CALL UFBINT(-NFOUT,POB,1,_NL_,NLL,'POB')
+<          CALL UFBINT(-NFOUT,TOB,1,_NL_,NLL,'TOB')
+<          CALL UFBINT(-NFOUT,ZOB,1,_NL_,NLL,'ZOB')
+<          CALL UFBINT(-NFOUT,PQM,1,_NL_,NLL,'PQM')
+<          CALL UFBINT(-NFOUT,TQM,1,_NL_,NLL,'TQM')
+<          CALL UFBINT(-NFOUT,ZQM,1,_NL_,NLL,'ZQM')
+<          CALL UFBINT(-NFOUT,QQM,1,_NL_,NLL,'QQM')
+---
+>          CALL UFBINT(-NFOUT,POB,1,255,NLL,'POB')
+>          CALL UFBINT(-NFOUT,TOB,1,255,NLL,'TOB')
+>          CALL UFBINT(-NFOUT,ZOB,1,255,NLL,'ZOB')
+>          CALL UFBINT(-NFOUT,PQM,1,255,NLL,'PQM')
+>          CALL UFBINT(-NFOUT,TQM,1,255,NLL,'TQM')
+>          CALL UFBINT(-NFOUT,ZQM,1,255,NLL,'ZQM')
+>          CALL UFBINT(-NFOUT,QQM,1,255,NLL,'QQM')

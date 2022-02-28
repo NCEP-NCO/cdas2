@@ -1,0 +1,23 @@
+Change to r2_ssi (4/2008)
+
+
+Previously this program used fixed sized arrays to hold observations.  Every 
+once in a while, the program would fail because of the number of observations 
+would exceed the array size.  Someone would have to up the array size and 
+rerun the code.
+
+This revision to the code uses dynamic arrays, so the overflow problem
+should never occur again.  I also changed some (but not all) the
+loops to f90 style.
+
+This code was compared with the old code, and the results were bit
+reproducable except when the old code failed because of the array
+overflow.
+
+     Wesley Ebisuzaki 4/2008
+
+
+
+
+
+

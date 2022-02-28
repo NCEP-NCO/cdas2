@@ -1,0 +1,108 @@
+#!/bin/sh
+set -xa
+
+
+########################################
+# Ingest the pentad data from CPC
+########################################
+
+# Specify whether the run is production or development
+export RUN_ENVIR=${RUN_ENVIR:-prod}
+if [ "$PACKAGEROOT" = '' ] ; then
+   echo 'ERROR: $PACKGEROOT is undefined'
+   exit 7
+fi
+
+###############################################
+# SETUP SEASONAL FOREFCST PROCESSING VARIABLES
+###############################################
+export PS4='$SECONDS + '
+date
+
+
+##########################################################
+# obtain unique process id (pid) and make temp directory
+##########################################################
+export pid=$$
+
+export DATA=${DATA:-$DATAROOT/${jobid}}
+mkdir -p $DATA
+cd $DATA
+
+export NET=${NET:-cdas2}
+export RUN=${RUN:-cdas2}
+export model=${model:-cdas2}
+export version=${version:-${cdas2_ver}}
+
+###################################
+# Determine Job Output Name on System
+####################################
+export pgmout="OUTPUT.$$"
+touch $DATA/$pgmout
+export cycle=t${cyc}z
+if [ "$cyc" = '' ] ; then
+   echo '$cyc is undefined'
+   exit 8
+fi
+
+###############################
+# Set up NET and RUN
+###############################
+export SENDCOM=${SENDCOM:-YES}
+export SENDDBN=${SENDDBN:-YES}
+
+######################################
+# Define execution Area
+######################################
+export HOMEcdas2=${HOMEcdas2:-$PACKAGEROOT/$model.$version}
+export EXECcdas2=${EXECcdas2:-$HOMEcdas2/exec}
+export FIXcdas2=${FIXcdas2:-$HOMEcdas2/fix}
+export PARMcdas2=${PARMcdas2:-$HOMEcdas2/parm}
+export USHcdas2=${USHcdas2:-$HOMEcdas2/ush}
+
+##############################
+# Run setpdy and initialize PDY variables
+##############################
+setpdy.sh
+. ./PDY
+env
+
+######################################
+# Define the OUTPUT file directory
+######################################
+export COMCDAS2=${COMCDAS2:-$(compath.py ${NET}/${version})}
+export COMcdas2=$COMCDAS2/${RUN}.${PDY}
+export COMarkv=$COMCDAS2/${RUN}.`echo $PDY | cut -c1-6`
+
+######################################
+# Define the OUTPUT file directory
+######################################
+export COMOUT=${COMOUT:-$COMCDAS2/pentad}
+
+mkdir -p $COMOUT
+
+#########################################################
+# Start retrieving the pentad file (in grads format)from 
+# the /dcom/pentad 
+#########################################################
+export DCOM_DIR=${DCOM_DIR:-$DCOMROOT/pentad}
+
+#######################################
+# Execute the script
+#######################################
+$HOMEcdas2/scripts/excdas2_v1_getpentad.sh
+err=$?
+
+###################################################
+# msg end of job and clean up temperary directory
+###################################################
+cat $pgmout
+msg="ENDED NORMALLY."
+[ "$err" -ne 0 ] && msg="ENDED ABNORMALLY."
+postmsg "$msg"
+date
+
+cd $DATAROOT
+if [ "${KEEPDATA:-NO}" != "YES" ] ; then rm -rf $DATA ; fi
+
+exit $err

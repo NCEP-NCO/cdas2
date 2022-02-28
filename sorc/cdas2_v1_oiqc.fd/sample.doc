@@ -1,0 +1,32 @@
+Setting parameters
+
+[Wesley.Ebisuzaki@t14a2 Wesley.Ebisuzaki]$ binv prepbufr2014100700 
+ 
+type        messages       subsets         bytes
+ 
+ADPUPA           233          1378       2044390        5.91
+AIRCAR          2838        316370      28154702      111.48
+AIRCFT           287         34588       2802362      120.52
+SATWND           668         99750       6519832      149.33
+SATEMP           335          7552       3238708       22.54
+ADPSFC           312         42798       3042550      137.17
+SFCSHP           148         22546       1409580      152.34
+TOTAL           4821        524982      47212124
+
+MAXM: 
+  total # bufr messages 4821
+  change MAXM from 9000 to 15000 (3x factor)
+
+MAXS:
+  Number of subsets
+  316370 / 2838 = 111  (average # subsets in ACARS)
+  MAXS = 500 can remain
+
+MAXCYL:
+  Number of obs in one location .. aircraft at airport .. overflow
+  old 100000
+  new 200000
+
+MAXREP:
+  Number of reports
+

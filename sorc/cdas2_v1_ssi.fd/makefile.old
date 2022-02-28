@@ -1,0 +1,35 @@
+obj=chlml.o conmc.o dtast.o dvast.o fulldivt.o  g2s0.o gdcrdn.o gdcrdp.o \
+	genqsat.o getbaln.o getlalo.o getpln.o  glbsoi2.o grad2s.o gtbdivt.o \
+	gtbhalf.o hoper.o hopers.o htoper.o  inguess.o inguessv.o  initps2.o \
+	initqpw2.o initsat6.o  initt3.o initw2.o intps2.o intqpw2.o  intrp2.o \
+	intrp3.o intt3.o intw2.o  m1glat.o m1ipqr.o m1poly.o m1rcons2.o  pcgsoi5.o  \
+	prepp.o preppw.o prepq.o preps.o prept.o prepw.o prnon85.o qoper.o \
+	qtoper.o  rdfact.o rdgesc.o rdprep7.o rdtest9.o  residw.o respsf.o \
+	respw.o resq.o ressat.o restmp.o  s2g0.o s2grad.o s2gvec.o s2mg2x.o \
+	satc2.o satcov.o satop46.o  setuprhs5.o sprp2.o sprqpw2.o sprs6.o sprt2.o \
+	spruv2.o  ssi2.o tg2s0.o tgrad2s.o ts2g0.o ts2grad.o ts2gvec.o wranlc.o  \
+	fft99m.o sdot.o sgemv.o minv.o isrchfle.o isrchfge.o w3fs03.o w3fs11.o \
+	w3fs21.o 
+
+fflags=-O2 -qrealsize=8
+cflags=-q64 -c -O2
+
+bufr=/u/wx51we/home/r2/opn/sorc/bufr/bufr.o
+# w3=/u/wx51we/home/r2/opn/sorc/w3lib/w3lib.a
+w3=mova2i.o iw3jdn.o
+
+f=r2_ssi
+
+
+$f.x:	$(obj) $(bufr) $(w3)
+	xlf_r -o $f.x  $(obj) $(bufr) $(w3)
+
+.f.o:
+	xlf_r ${fflags} -c $<
+
+
+.c.o:
+	xlc_r -c ${cflags} $<
+
+clean:
+	-rm -f $(obj)
